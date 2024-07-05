@@ -13,7 +13,8 @@ struct MusicSearchAppMVIApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeView()
+            //ContentView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
