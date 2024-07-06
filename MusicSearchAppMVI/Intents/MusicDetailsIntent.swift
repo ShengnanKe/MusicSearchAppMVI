@@ -5,7 +5,7 @@
 //  Created by KKNANXX on 7/4/24.
 //
 
-import Combine
+import Foundation
 import SwiftUI
 import AVFoundation
 import CoreData
@@ -56,7 +56,13 @@ class MusicDetailsIntent: ObservableObject {
         state.isLoading = false
     }
     
-    func playPreview() async {
+    func playPreview() {
+        Task {
+            await playPreviewAsync()
+        }
+    }
+    
+    func playPreviewAsync() async {
         guard let url = URL(string: state.songInfo.preview) else {
             state.errorMessage = "Invalid preview URL"
             return
@@ -79,11 +85,15 @@ class MusicDetailsIntent: ObservableObject {
     }
 
     func bookmarkTrack(context: NSManagedObjectContext) {
+        Task {
+            await bookmarkTrackAsync(context: context)
+        }
+    }
+
+    func bookmarkTrackAsync(context: NSManagedObjectContext) async {
         dbManager.setContext(context)
         state.isBookmarked = true
-        Task {
-            await saveTrackToLocalStorage(context: context)
-        }
+        await saveTrackToLocalStorage(context: context)
     }
 
     private func saveTrackToLocalStorage(context: NSManagedObjectContext) async {

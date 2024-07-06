@@ -43,7 +43,9 @@ struct MusicDetailView: View {
                     if intent.state.isPlaying {
                         intent.stopPlaying()
                     } else {
-                        intent.playPreview()
+                        Task {
+                            await intent.playPreviewAsync()
+                        }
                     }
                 }) {
                     Text(intent.state.isPlaying ? "Stop" : "Play Preview")
@@ -55,7 +57,9 @@ struct MusicDetailView: View {
                 .padding()
                 
                 Button(action: {
-                    intent.bookmarkTrack(context: viewContext)
+                    Task {
+                        await intent.bookmarkTrackAsync(context: viewContext)
+                    }
                 }) {
                     Image(systemName: intent.state.isBookmarked ? "bookmark.fill" : "bookmark")
                 }

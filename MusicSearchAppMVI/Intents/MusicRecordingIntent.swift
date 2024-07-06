@@ -57,11 +57,30 @@ class MusicRecordingIntent: ObservableObject {
             
             context.delete(recordingToDelete)
         }
-        do {
-            try context.save()
-            loadRecordings(context: context)
-        } catch {
-            state.errorMessage = "Failed to delete recording: \(error)"
+        
+        saveContext(context)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let error):
+                    self.state.errorMessage = "Failed to delete recording: \(error.localizedDescription)"
+                case .finished:
+                    break
+                }
+            }, receiveValue: {
+                self.loadRecordings(context: context)
+            })
+            .store(in: &cancellables)
+    }
+    
+    private func saveContext(_ context: NSManagedObjectContext) -> AnyPublisher<Void, Error> {
+        Future<Void, Error> { promise in
+            do {
+                try context.save()
+                promise(.success(()))
+            } catch {
+                promise(.failure(error))
+            }
         }
+        .eraseToAnyPublisher()
     }
 }

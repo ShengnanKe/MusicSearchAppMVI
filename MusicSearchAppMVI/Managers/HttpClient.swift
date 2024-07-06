@@ -126,4 +126,15 @@ class HttpClient {
         }
         return data
     }
+    
+    func fetchImagePublisher(from url: URL) -> AnyPublisher<UIImage?, Error> {
+        URLSession.shared.dataTaskPublisher(for: url)
+            .tryMap { data, response in
+                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                    throw URLError(.badServerResponse)
+                }
+                return UIImage(data: data)
+            }
+            .eraseToAnyPublisher()
+    }
 }
