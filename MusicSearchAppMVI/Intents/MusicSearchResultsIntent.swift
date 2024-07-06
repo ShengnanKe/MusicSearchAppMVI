@@ -8,10 +8,10 @@
 import Combine
 import SwiftUI
 
+//@MainActor
 class MusicSearchResultsIntent: ObservableObject {
     @Published private(set) var state: MusicSearchState
-    private var cancellables = Set<AnyCancellable>()
-    
+
     init(searchQuery: String) {
         self.state = MusicSearchState(searchQuery: searchQuery)
         fetchSearchResults()
@@ -21,22 +21,16 @@ class MusicSearchResultsIntent: ObservableObject {
         state.isLoading = true
         state.errorMessage = nil
         
-        let request = MusicSearchRequest(query: state.searchQuery)
-        
-        HttpClient().fetchDataPublisher(from: request)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .failure(let error):
-                    self.state.errorMessage = error.localizedDescription
-                    self.state.isLoading = false
-                case .finished:
-                    break
-                }
-            }, receiveValue: { (results: MusicRequestInfo) in
+        Task {
+            do {
+                let request = MusicSearchRequest(query: state.searchQuery)
+                let results: MusicRequestInfo = try await HttpClient().fetchData(from: request)
                 self.state.searchResults = results.data
                 self.state.isLoading = false
-            })
-            .store(in: &cancellables)
+            } catch {
+                self.state.errorMessage = error.localizedDescription
+                self.state.isLoading = false
+            }
+        }
     }
 }

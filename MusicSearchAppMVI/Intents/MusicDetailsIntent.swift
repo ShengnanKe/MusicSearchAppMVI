@@ -22,9 +22,9 @@ struct MusicDetailsState {
     let songInfo: SongInfo
 }
 
+@MainActor
 class MusicDetailsIntent: ObservableObject {
     @Published private(set) var state: MusicDetailsState
-    private var cancellables = Set<AnyCancellable>()
     private var audioPlayer: AVAudioPlayer?
     private var audioRecorder: AVAudioRecorder?
     private var recordingURL: URL?
@@ -34,48 +34,43 @@ class MusicDetailsIntent: ObservableObject {
     
     init(songInfo: SongInfo) {
         self.state = MusicDetailsState(songInfo: songInfo)
-        loadImages()
+        Task {
+            await loadImages()
+        }
     }
     
-    func loadImages() {
+    func loadImages() async {
         state.isLoading = true
         
-        let artistImagePublisher = fetchImage(urlString: state.songInfo.artist.effectiveArtistPicture)
-        let albumCoverPublisher = fetchImage(urlString: state.songInfo.album.effectiveSongCover)
+        do {
+            async let artistImage = fetchImage(urlString: state.songInfo.artist.effectiveArtistPicture)
+            async let albumCoverImage = fetchImage(urlString: state.songInfo.album.effectiveSongCover)
+            
+            let (artist, album) = try await (artistImage, albumCoverImage)
+            self.state.artistImage = artist
+            self.state.albumCoverImage = album
+        } catch {
+            self.state.errorMessage = "Failed to load images: \(error.localizedDescription)"
+        }
         
-        Publishers.Zip(artistImagePublisher, albumCoverPublisher)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                if case .failure(let error) = completion {
-                    self.state.errorMessage = "Failed to load images: \(error)"
-                }
-                self.state.isLoading = false
-            }, receiveValue: { artistImage, albumCoverImage in
-                self.state.artistImage = artistImage
-                self.state.albumCoverImage = albumCoverImage
-            })
-            .store(in: &cancellables)
+        state.isLoading = false
     }
     
-    func playPreview() {
+    func playPreview() async {
         guard let url = URL(string: state.songInfo.preview) else {
             state.errorMessage = "Invalid preview URL"
             return
         }
         
-        httpClient.fetchDataPublisher(from: url)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                if case .failure(let error) = completion {
-                    self.state.errorMessage = "Failed to play preview: \(error)"
-                }
-            }, receiveValue: { data in
-                self.audioPlayer = try? AVAudioPlayer(data: data)
-                self.audioPlayer?.prepareToPlay()
-                self.audioPlayer?.play()
-                self.state.isPlaying = true
-            })
-            .store(in: &cancellables)
+        do {
+            let data = try await httpClient.fetchData(from: url)
+            self.audioPlayer = try AVAudioPlayer(data: data)
+            self.audioPlayer?.prepareToPlay()
+            self.audioPlayer?.play()
+            self.state.isPlaying = true
+        } catch {
+            self.state.errorMessage = "Failed to play preview: \(error.localizedDescription)"
+        }
     }
 
     func stopPlaying() {
@@ -86,39 +81,34 @@ class MusicDetailsIntent: ObservableObject {
     func bookmarkTrack(context: NSManagedObjectContext) {
         dbManager.setContext(context)
         state.isBookmarked = true
-        saveTrackToLocalStorage(context: context)
+        Task {
+            await saveTrackToLocalStorage(context: context)
+        }
     }
 
-    private func saveTrackToLocalStorage(context: NSManagedObjectContext) {
+    private func saveTrackToLocalStorage(context: NSManagedObjectContext) async {
         guard let url = URL(string: state.songInfo.preview) else {
             state.errorMessage = "Invalid URL"
             return
         }
         
-        httpClient.fetchDataPublisher(from: url)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                if case .failure(let error) = completion {
-                    self.state.errorMessage = "Failed to save track: \(error)"
-                }
-            }, receiveValue: { data in
-                guard let tracksDirectory = self.fileManager.getDirectory(for: "Tracks") else { return }
-                let fileName = self.state.songInfo.title.replacingOccurrences(of: " ", with: "_") + ".mp3"
-                let destinationURL = tracksDirectory.appendingPathComponent(fileName)
-                do {
-                    try data.write(to: destinationURL)
-                    self.dbManager.context = context
-                    self.dbManager.addMusicData(
-                        songTitle: self.state.songInfo.title,
-                        artistName: self.state.songInfo.artist.name,
-                        artistPhoto: self.state.songInfo.artist.artistPictureSmall,
-                        albumCover: self.state.songInfo.album.songCoverSmall
-                    )
-                } catch {
-                    self.state.errorMessage = "Failed to save track: \(error)"
-                }
-            })
-            .store(in: &cancellables)
+        do {
+            let data = try await httpClient.fetchData(from: url)
+            guard let tracksDirectory = fileManager.getDirectory(for: "Tracks") else { return }
+            let fileName = state.songInfo.title.replacingOccurrences(of: " ", with: "_") + ".mp3"
+            let destinationURL = tracksDirectory.appendingPathComponent(fileName)
+            
+            try data.write(to: destinationURL)
+            dbManager.context = context
+            dbManager.addMusicData(
+                songTitle: state.songInfo.title,
+                artistName: state.songInfo.artist.name,
+                artistPhoto: state.songInfo.artist.artistPictureSmall,
+                albumCover: state.songInfo.album.songCoverSmall
+            )
+        } catch {
+            state.errorMessage = "Failed to save track: \(error.localizedDescription)"
+        }
     }
 
     func startRecording() {
@@ -145,7 +135,7 @@ class MusicDetailsIntent: ObservableObject {
                             self.audioRecorder?.record()
                             self.state.isRecording = true
                         } catch {
-                            self.state.errorMessage = "Failed to start recording: \(error)"
+                            self.state.errorMessage = "Failed to start recording: \(error.localizedDescription)"
                         }
                     }
                 } else {
@@ -153,7 +143,7 @@ class MusicDetailsIntent: ObservableObject {
                 }
             }
         } catch {
-            self.state.errorMessage = "Failed to set up recording session: \(error)"
+            self.state.errorMessage = "Failed to set up recording session: \(error.localizedDescription)"
         }
     }
 
@@ -170,7 +160,7 @@ class MusicDetailsIntent: ObservableObject {
             dbManager.setContext(context)
             dbManager.addRecording(title: title, date: Date())
         } catch {
-            state.errorMessage = "Failed to save recording: \(error)"
+            state.errorMessage = "Failed to save recording: \(error.localizedDescription)"
         }
     }
 
@@ -180,10 +170,11 @@ class MusicDetailsIntent: ObservableObject {
         state.isBookmarked = allBookmarkedMusic.contains { $0.songTitle == state.songInfo.title }
     }
     
-    private func fetchImage(urlString: String) -> AnyPublisher<UIImage?, Error> {
+    private func fetchImage(urlString: String) async throws -> UIImage? {
         guard let url = URL(string: urlString) else {
-            return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+            throw URLError(.badURL)
         }
-        return httpClient.fetchImagePublisher(from: url)
+        let data = try await httpClient.fetchData(from: url)
+        return UIImage(data: data)
     }
 }

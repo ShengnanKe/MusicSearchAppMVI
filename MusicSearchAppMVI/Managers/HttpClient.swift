@@ -11,6 +11,7 @@
 import Foundation
 import Combine
 import SwiftUI
+import UIKit
 
 enum AppError: Error {
     case badURL
@@ -90,66 +91,39 @@ extension RequestBuilder {
     }
 }
 
-
-
 class HttpClient {
-    func fetchDataPublisher<T: Decodable>(from requestBuilder: RequestBuilder) -> AnyPublisher<T, Error> {
-        do {
-            let request = try requestBuilder.buildRequest()
-            return URLSession.shared.dataTaskPublisher(for: request)
-                .tryMap { data, response in
-                    guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                        throw URLError(.badServerResponse)
-                    }
-                    return data
-                }
-                .decode(type: T.self, decoder: JSONDecoder())
-                .eraseToAnyPublisher()
-        } catch {
-            return Fail(error: error).eraseToAnyPublisher()
+    func fetchData<T: Decodable>(from requestBuilder: RequestBuilder) async throws -> T {
+        let request = try requestBuilder.buildRequest()
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
         }
+        let decodedData = try JSONDecoder().decode(T.self, from: data)
+        return decodedData
     }
     
-    func downloadPublisher(from requestBuilder: RequestBuilder) -> AnyPublisher<URL, Error> {
-        do {
-            let request = try requestBuilder.buildRequest()
-            return Future<URL, Error> { promise in
-                let task = URLSession.shared.downloadTask(with: request) { tempURL, response, error in
-                    if let error = error {
-                        promise(.failure(error))
-                    } else if let tempURL = tempURL, let response = response as? HTTPURLResponse, response.statusCode == 200 {
-                        promise(.success(tempURL))
-                    } else {
-                        promise(.failure(URLError(.badServerResponse)))
-                    }
-                }
-                task.resume()
-            }
-            .eraseToAnyPublisher()
-        } catch {
-            return Fail(error: error).eraseToAnyPublisher()
+    func download(from requestBuilder: RequestBuilder) async throws -> URL {
+        let request = try requestBuilder.buildRequest()
+        let (tempURL, response) = try await URLSession.shared.download(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
         }
+        return tempURL
     }
     
-    func fetchImagePublisher(from url: URL) -> AnyPublisher<UIImage?, Error> {
-        URLSession.shared.dataTaskPublisher(for: url)
-            .tryMap { data, response in
-                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                    throw URLError(.badServerResponse)
-                }
-                return UIImage(data: data)
-            }
-            .eraseToAnyPublisher()
+    func fetchImage(from url: URL) async throws -> UIImage? {
+        let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url))
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        return UIImage(data: data)
     }
     
-    func fetchDataPublisher(from url: URL) -> AnyPublisher<Data, Error> {
-        URLSession.shared.dataTaskPublisher(for: url)
-            .tryMap { data, response in
-                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                    throw URLError(.badServerResponse)
-                }
-                return data
-            }
-            .eraseToAnyPublisher()
+    func fetchData(from url: URL) async throws -> Data {
+        let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url))
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        return data
     }
 }
