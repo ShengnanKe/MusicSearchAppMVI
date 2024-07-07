@@ -8,28 +8,34 @@
 import SwiftUI
 
 struct MusicRecordingDetailsView: View {
-    @StateObject var intent: MusicRecordingDetailsIntent
+    @StateObject private var container: MVIContainer<MusicRecordingDetailsIntent, MusicRecordingDetailsModel>
+
+    init(recording: MusicRecording) {
+        let model = MusicRecordingDetailsModel(recording: recording)
+        let intent = MusicRecordingDetailsIntent(model: model)
+        _container = StateObject(wrappedValue: MVIContainer(intent: intent, model: model, modelChangePublisher: model.objectWillChange))
+    }
 
     var body: some View {
         VStack {
-            Text(intent.state.recording.title ?? "Untitled")
+            Text(container.model.recording.title ?? "Untitled")
                 .font(.title)
                 .padding()
             
-            Text("Recorded on \(intent.state.recording.date ?? Date(), formatter: itemFormatter)")
+            Text("Recorded on \(container.model.recording.date ?? Date(), formatter: itemFormatter)")
                 .font(.subheadline)
                 .padding()
             
             Button(action: {
-                if intent.state.isPlaying {
-                    intent.stopPlaying()
+                if container.model.isPlaying {
+                    container.intent.stopPlaying()
                 } else {
-                    intent.playRecording()
+                    container.intent.playRecording()
                 }
             }) {
-                Text(intent.state.isPlaying ? "Stop" : "Play Recording")
+                Text(container.model.isPlaying ? "Stop" : "Play Recording")
                     .padding()
-                    .background(intent.state.isPlaying ? Color.red : Color.green)
+                    .background(container.model.isPlaying ? Color.red : Color.green)
                     .foregroundColor(.white)
                     .cornerRadius(8)
             }

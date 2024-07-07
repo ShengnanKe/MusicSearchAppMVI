@@ -8,23 +8,23 @@
 import SwiftUI
 
 struct MusicSearchResultsView: View {
-    @ObservedObject var intent: MusicSearchIntent
+    @ObservedObject var container: MVIContainer<MusicSearchIntent, MusicSearchModel>
     
     var body: some View {
         VStack {
-            if intent.state.isLoading {
+            if container.model.isLoading {
                 ProgressView()
                     .scaleEffect(2.0, anchor: .center)
                     .padding()
-            } else if let errorMessage = intent.state.errorMessage {
+            } else if let errorMessage = container.model.errorMessage {
                 Text("Error: \(errorMessage)")
                     .foregroundColor(.red)
                     .padding()
             } else {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
-                        ForEach(intent.state.searchResults, id: \.title) { song in
-                            NavigationLink(destination: MusicDetailView(intent: MusicDetailsIntent(songInfo: song))) {
+                        ForEach(container.model.searchResults, id: \.title) { song in
+                            NavigationLink(destination: MusicDetailView(songInfo: song)) {
                                 VStack {
                                     AsyncImage(url: URL(string: song.album.effectiveSongCover)) { image in
                                         image

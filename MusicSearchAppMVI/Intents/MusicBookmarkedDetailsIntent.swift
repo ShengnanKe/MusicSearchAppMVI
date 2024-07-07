@@ -10,50 +10,42 @@ import Combine
 import SwiftUI
 import AVFoundation
 
-struct MusicBookmarkedDetailsState {
-    var artistImage: UIImage?
-    var albumCoverImage: UIImage?
-    var isPlaying: Bool = false
-    let songTitle: String
-    let artistName: String
-    let artistPhoto: String
-    let albumCover: String
-}
-
+@MainActor
 class MusicBookmarkedDetailsIntent: ObservableObject {
-    @Published private(set) var state: MusicBookmarkedDetailsState
-    private var cancellables = Set<AnyCancellable>()
+    @Published private(set) var model: MusicBookmarkedDetailsModel
     private var audioPlayer: AVAudioPlayer?
     private let fileManager = FAFileManager.shared
-    
-    init(songTitle: String, artistName: String, artistPhoto: String, albumCover: String) {
-        self.state = MusicBookmarkedDetailsState(songTitle: songTitle, artistName: artistName, artistPhoto: artistPhoto, albumCover: albumCover)
-        loadImages()
-    }
-    
-    func loadImages() {
-        let artistImagePublisher = fetchImage(urlString: state.artistPhoto)
-        let albumCoverPublisher = fetchImage(urlString: state.albumCover)
-        
-        Publishers.Zip(artistImagePublisher, albumCoverPublisher)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                if case .failure(let error) = completion {
-                    print("Failed to load images: \(error)")
-                }
-            }, receiveValue: { artistImage, albumCoverImage in
-                self.state.artistImage = artistImage
-                self.state.albumCoverImage = albumCoverImage
-            })
-            .store(in: &cancellables)
-    }
 
+    init(model: MusicBookmarkedDetailsModel) {
+        self.model = model
+        Task {
+            await loadImages()
+        }
+    }
+    
+    func loadImages() async {
+        model.isLoading = true
+        
+        do {
+            async let artistImage = fetchImage(urlString: model.artistPhoto)
+            async let albumCoverImage = fetchImage(urlString: model.albumCover)
+            
+            let (artist, album) = try await (artistImage, albumCoverImage)
+            self.model.artistImage = artist
+            self.model.albumCoverImage = album
+        } catch {
+            self.model.errorMessage = "Failed to load images: \(error.localizedDescription)"
+        }
+        
+        model.isLoading = false
+    }
+    
     func playLocalTrack() {
         guard let tracksDirectory = fileManager.getDirectory(for: "Tracks") else {
             print("Failed to get tracks directory")
             return
         }
-        let fileName = state.songTitle.replacingOccurrences(of: " ", with: "_") + ".mp3"
+        let fileName = model.songTitle.replacingOccurrences(of: " ", with: "_") + ".mp3"
         let trackURL = tracksDirectory.appendingPathComponent(fileName)
         
         do {
@@ -61,7 +53,7 @@ class MusicBookmarkedDetailsIntent: ObservableObject {
             audioPlayer = try AVAudioPlayer(data: data)
             audioPlayer?.prepareToPlay()
             audioPlayer?.play()
-            state.isPlaying = true
+            model.isPlaying = true
         } catch {
             print("Failed to play local track: \(error)")
         }
@@ -69,13 +61,14 @@ class MusicBookmarkedDetailsIntent: ObservableObject {
 
     func stopPlaying() {
         audioPlayer?.stop()
-        state.isPlaying = false
+        model.isPlaying = false
     }
     
-    private func fetchImage(urlString: String) -> AnyPublisher<UIImage?, Error> {
+    private func fetchImage(urlString: String) async throws -> UIImage? {
         guard let url = URL(string: urlString) else {
-            return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+            throw URLError(.badURL)
         }
-        return HttpClient().fetchImagePublisher(from: url)
+        let data = try await HttpClient().fetchData(from: url)
+        return UIImage(data: data)
     }
 }

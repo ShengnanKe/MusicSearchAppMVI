@@ -8,22 +8,42 @@
 import SwiftUI
 
 struct MusicSearchView: View {
-    @StateObject private var intent = MusicSearchIntent()
+    @StateObject private var container: MVIContainer<MusicSearchIntent, MusicSearchModel>
+    @State private var isSearching = false
+    
+    init() {
+        let model = MusicSearchModel()
+        let intent = MusicSearchIntent(model: model)
+        _container = StateObject(wrappedValue: MVIContainer(intent: intent, model: model, modelChangePublisher: model.objectWillChange))
+    }
     
     var body: some View {
         NavigationStack {
             VStack {
+                HStack {
+                    TextField("Search for music ...", text: $container.model.searchQuery)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    Button(action: {
+                        isSearching = true
+                        Task {
+                            await container.intent.fetchSearchResults(for: container.model.searchQuery)
+                            isSearching = false
+                        }
+                    }) {
+                        Text("Search")
+                    }
+                }
+                .padding()
+                
                 NavigationLink(
-                    destination: MusicSearchResultsView(intent: intent),
-                    isActive: .constant(!intent.state.searchQuery.isEmpty)
+                    destination: MusicSearchResultsView(container: container),
+                    isActive: $isSearching
                 ) {
                     EmptyView()
                 }
             }
-            .padding()
             .navigationTitle("Music Search Page")
             .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $intent.searchQuery, prompt: "Search for music ...")
         }
     }
 }

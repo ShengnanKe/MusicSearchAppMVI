@@ -10,25 +10,25 @@ import Combine
 import CoreData
 import SwiftUI
 
-struct MusicRecordingState {
-    var recordings: [MusicRecording] = []
-    var errorMessage: String?
-}
-
+@MainActor
 class MusicRecordingIntent: ObservableObject {
-    @Published private(set) var state = MusicRecordingState()
+    @Published private(set) var model: MusicRecordingModel
     private var cancellables = Set<AnyCancellable>()
     private let dbManager = DBManager.shared
     private let fileManager = FAFileManager.shared
 
+    init(model: MusicRecordingModel) {
+        self.model = model
+    }
+
     func loadRecordings(context: NSManagedObjectContext) {
         dbManager.setContext(context)
-        state.recordings = dbManager.fetchRecordingData()
+        model.recordings = dbManager.fetchRecordingData()
     }
 
     func deleteRecording(context: NSManagedObjectContext, at offsets: IndexSet) {
         for index in offsets {
-            let recordingToDelete = state.recordings[index]
+            let recordingToDelete = model.recordings[index]
             
             // 删除local file
             if let title = recordingToDelete.title {
@@ -62,7 +62,7 @@ class MusicRecordingIntent: ObservableObject {
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .failure(let error):
-                    self.state.errorMessage = "Failed to delete recording: \(error.localizedDescription)"
+                    self.model.errorMessage = "Failed to delete recording: \(error.localizedDescription)"
                 case .finished:
                     break
                 }

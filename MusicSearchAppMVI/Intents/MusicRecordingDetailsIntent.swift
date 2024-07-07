@@ -15,17 +15,18 @@ struct MusicRecordingDetailsState {
     let recording: MusicRecording
 }
 
+@MainActor
 class MusicRecordingDetailsIntent: ObservableObject {
-    @Published private(set) var state: MusicRecordingDetailsState
+    @Published private(set) var model: MusicRecordingDetailsModel
     private var audioPlayer: AVAudioPlayer?
     private let fileManager = FAFileManager.shared
 
-    init(recording: MusicRecording) {
-        self.state = MusicRecordingDetailsState(recording: recording)
+    init(model: MusicRecordingDetailsModel) {
+        self.model = model
     }
 
     func playRecording() {
-        guard let title = state.recording.title else { return }
+        guard let title = model.recording.title else { return }
         guard let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return }
         guard let recordingsDirectory = fileManager.getDirectory(for: "Recordings") else {
             print("Failed to get recordings directory")
@@ -38,7 +39,7 @@ class MusicRecordingDetailsIntent: ObservableObject {
             audioPlayer = try AVAudioPlayer(data: data)
             audioPlayer?.prepareToPlay()
             audioPlayer?.play()
-            state.isPlaying = true
+            model.isPlaying = true
         } catch {
             print("Failed to play recording: \(error)")
         }
@@ -46,6 +47,6 @@ class MusicRecordingDetailsIntent: ObservableObject {
 
     func stopPlaying() {
         audioPlayer?.stop()
-        state.isPlaying = false
+        model.isPlaying = false
     }
 }

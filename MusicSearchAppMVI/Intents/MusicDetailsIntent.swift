@@ -6,25 +6,14 @@
 //
 
 import Foundation
-import SwiftUI
+import Combine
 import AVFoundation
+import SwiftUI
 import CoreData
-
-struct MusicDetailsState {
-    var artistImage: UIImage?
-    var albumCoverImage: UIImage?
-    var isLoading: Bool = false
-    var errorMessage: String?
-    var isBookmarked: Bool = false
-    var isPlaying: Bool = false
-    var isRecording: Bool = false
-    var showRecordingSheet: Bool = false
-    let songInfo: SongInfo
-}
 
 @MainActor
 class MusicDetailsIntent: ObservableObject {
-    @Published private(set) var state: MusicDetailsState
+    @Published private(set) var model: MusicDetailsModel
     private var audioPlayer: AVAudioPlayer?
     private var audioRecorder: AVAudioRecorder?
     private var recordingURL: URL?
@@ -32,28 +21,28 @@ class MusicDetailsIntent: ObservableObject {
     private let fileManager = FAFileManager.shared
     private let httpClient = HttpClient()
     
-    init(songInfo: SongInfo) {
-        self.state = MusicDetailsState(songInfo: songInfo)
+    init(model: MusicDetailsModel) {
+        self.model = model
         Task {
             await loadImages()
         }
     }
     
     func loadImages() async {
-        state.isLoading = true
+        model.isLoading = true
         
         do {
-            async let artistImage = fetchImage(urlString: state.songInfo.artist.effectiveArtistPicture)
-            async let albumCoverImage = fetchImage(urlString: state.songInfo.album.effectiveSongCover)
+            async let artistImage = fetchImage(urlString: model.songInfo.artist.effectiveArtistPicture)
+            async let albumCoverImage = fetchImage(urlString: model.songInfo.album.effectiveSongCover)
             
             let (artist, album) = try await (artistImage, albumCoverImage)
-            self.state.artistImage = artist
-            self.state.albumCoverImage = album
+            self.model.artistImage = artist
+            self.model.albumCoverImage = album
         } catch {
-            self.state.errorMessage = "Failed to load images: \(error.localizedDescription)"
+            self.model.errorMessage = "Failed to load images: \(error.localizedDescription)"
         }
         
-        state.isLoading = false
+        model.isLoading = false
     }
     
     func playPreview() {
@@ -63,8 +52,8 @@ class MusicDetailsIntent: ObservableObject {
     }
     
     func playPreviewAsync() async {
-        guard let url = URL(string: state.songInfo.preview) else {
-            state.errorMessage = "Invalid preview URL"
+        guard let url = URL(string: model.songInfo.preview) else {
+            model.errorMessage = "Invalid preview URL"
             return
         }
         
@@ -73,15 +62,15 @@ class MusicDetailsIntent: ObservableObject {
             self.audioPlayer = try AVAudioPlayer(data: data)
             self.audioPlayer?.prepareToPlay()
             self.audioPlayer?.play()
-            self.state.isPlaying = true
+            self.model.isPlaying = true
         } catch {
-            self.state.errorMessage = "Failed to play preview: \(error.localizedDescription)"
+            self.model.errorMessage = "Failed to play preview: \(error.localizedDescription)"
         }
     }
 
     func stopPlaying() {
         audioPlayer?.stop()
-        state.isPlaying = false
+        model.isPlaying = false
     }
 
     func bookmarkTrack(context: NSManagedObjectContext) {
@@ -92,32 +81,32 @@ class MusicDetailsIntent: ObservableObject {
 
     func bookmarkTrackAsync(context: NSManagedObjectContext) async {
         dbManager.setContext(context)
-        state.isBookmarked = true
+        model.isBookmarked = true
         await saveTrackToLocalStorage(context: context)
     }
 
     private func saveTrackToLocalStorage(context: NSManagedObjectContext) async {
-        guard let url = URL(string: state.songInfo.preview) else {
-            state.errorMessage = "Invalid URL"
+        guard let url = URL(string: model.songInfo.preview) else {
+            model.errorMessage = "Invalid URL"
             return
         }
         
         do {
             let data = try await httpClient.fetchData(from: url)
             guard let tracksDirectory = fileManager.getDirectory(for: "Tracks") else { return }
-            let fileName = state.songInfo.title.replacingOccurrences(of: " ", with: "_") + ".mp3"
+            let fileName = model.songInfo.title.replacingOccurrences(of: " ", with: "_") + ".mp3"
             let destinationURL = tracksDirectory.appendingPathComponent(fileName)
             
             try data.write(to: destinationURL)
             dbManager.context = context
             dbManager.addMusicData(
-                songTitle: state.songInfo.title,
-                artistName: state.songInfo.artist.name,
-                artistPhoto: state.songInfo.artist.artistPictureSmall,
-                albumCover: state.songInfo.album.songCoverSmall
+                songTitle: model.songInfo.title,
+                artistName: model.songInfo.artist.name,
+                artistPhoto: model.songInfo.artist.artistPictureSmall,
+                albumCover: model.songInfo.album.songCoverSmall
             )
         } catch {
-            state.errorMessage = "Failed to save track: \(error.localizedDescription)"
+            model.errorMessage = "Failed to save track: \(error.localizedDescription)"
         }
     }
 
@@ -143,23 +132,23 @@ class MusicDetailsIntent: ObservableObject {
                         do {
                             self.audioRecorder = try AVAudioRecorder(url: self.recordingURL!, settings: settings)
                             self.audioRecorder?.record()
-                            self.state.isRecording = true
+                            self.model.isRecording = true
                         } catch {
-                            self.state.errorMessage = "Failed to start recording: \(error.localizedDescription)"
+                            self.model.errorMessage = "Failed to start recording: \(error.localizedDescription)"
                         }
                     }
                 } else {
-                    self.state.errorMessage = "Recording permission not granted"
+                    self.model.errorMessage = "Recording permission not granted"
                 }
             }
         } catch {
-            self.state.errorMessage = "Failed to set up recording session: \(error.localizedDescription)"
+            self.model.errorMessage = "Failed to set up recording session: \(error.localizedDescription)"
         }
     }
 
     func stopRecording(title: String, context: NSManagedObjectContext) {
         audioRecorder?.stop()
-        state.isRecording = false
+        model.isRecording = false
         
         guard let recordingURL = recordingURL else { return }
         
@@ -170,14 +159,14 @@ class MusicDetailsIntent: ObservableObject {
             dbManager.setContext(context)
             dbManager.addRecording(title: title, date: Date())
         } catch {
-            state.errorMessage = "Failed to save recording: \(error.localizedDescription)"
+            model.errorMessage = "Failed to save recording: \(error.localizedDescription)"
         }
     }
 
     func checkIfBookmarked(context: NSManagedObjectContext) {
         dbManager.setContext(context)
         let allBookmarkedMusic = dbManager.fetchMusicData()
-        state.isBookmarked = allBookmarkedMusic.contains { $0.songTitle == state.songInfo.title }
+        model.isBookmarked = allBookmarkedMusic.contains { $0.songTitle == model.songInfo.title }
     }
     
     private func fetchImage(urlString: String) async throws -> UIImage? {

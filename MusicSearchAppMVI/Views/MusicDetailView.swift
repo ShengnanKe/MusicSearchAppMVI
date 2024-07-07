@@ -8,19 +8,25 @@
 import SwiftUI
 
 struct MusicDetailView: View {
-    @StateObject var intent: MusicDetailsIntent
+    @StateObject private var container: MVIContainer<MusicDetailsIntent, MusicDetailsModel>
     @Environment(\.managedObjectContext) private var viewContext
     @State private var recordingTitle: String = ""
     @State private var showRecordingSheet = false
 
+    init(songInfo: SongInfo) {
+        let model = MusicDetailsModel(songInfo: songInfo)
+        let intent = MusicDetailsIntent(model: model)
+        _container = StateObject(wrappedValue: MVIContainer(intent: intent, model: model, modelChangePublisher: model.objectWillChange))
+    }
+
     var body: some View {
         ScrollView {
             VStack {
-                Text(intent.state.songInfo.title)
+                Text(container.model.songInfo.title)
                     .font(.title)
                     .padding()
                 
-                if let artistImage = intent.state.artistImage {
+                if let artistImage = container.model.artistImage {
                     Image(uiImage: artistImage)
                         .resizable()
                         .frame(width: 100, height: 100)
@@ -28,29 +34,29 @@ struct MusicDetailView: View {
                         .padding()
                 }
                 
-                if let albumCoverImage = intent.state.albumCoverImage {
+                if let albumCoverImage = container.model.albumCoverImage {
                     Image(uiImage: albumCoverImage)
                         .resizable()
                         .frame(width: 200, height: 200)
                         .padding()
                 }
                 
-                Text(intent.state.songInfo.artist.name)
+                Text(container.model.songInfo.artist.name)
                     .font(.headline)
                     .padding()
                 
                 Button(action: {
-                    if intent.state.isPlaying {
-                        intent.stopPlaying()
+                    if container.model.isPlaying {
+                        container.intent.stopPlaying()
                     } else {
                         Task {
-                            await intent.playPreviewAsync()
+                            await container.intent.playPreviewAsync()
                         }
                     }
                 }) {
-                    Text(intent.state.isPlaying ? "Stop" : "Play Preview")
+                    Text(container.model.isPlaying ? "Stop" : "Play Preview")
                         .padding()
-                        .background(intent.state.isPlaying ? Color.red : Color.green)
+                        .background(container.model.isPlaying ? Color.red : Color.green)
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
@@ -58,39 +64,39 @@ struct MusicDetailView: View {
                 
                 Button(action: {
                     Task {
-                        await intent.bookmarkTrackAsync(context: viewContext)
+                        await container.intent.bookmarkTrackAsync(context: viewContext)
                     }
                 }) {
-                    Image(systemName: intent.state.isBookmarked ? "bookmark.fill" : "bookmark")
+                    Image(systemName: container.model.isBookmarked ? "bookmark.fill" : "bookmark")
                 }
                 .padding()
 
                 Button(action: {
-                    if intent.state.isRecording {
+                    if container.model.isRecording {
                         showRecordingSheet = true
                     } else {
-                        intent.startRecording()
+                        container.intent.startRecording()
                     }
                 }) {
-                    Text(intent.state.isRecording ? "Stop Recording" : "Start Recording")
+                    Text(container.model.isRecording ? "Stop Recording" : "Start Recording")
                         .padding()
-                        .background(intent.state.isRecording ? Color.red : Color.green)
+                        .background(container.model.isRecording ? Color.red : Color.green)
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
                 .sheet(isPresented: $showRecordingSheet) {
                     RecordingTitleSheet(recordingTitle: $recordingTitle, onSave: {
-                        intent.stopRecording(title: recordingTitle, context: viewContext)
+                        container.intent.stopRecording(title: recordingTitle, context: viewContext)
                         showRecordingSheet = false
                     }, onCancel: {
-                        intent.stopRecording(title: "Untitled", context: viewContext)
+                        container.intent.stopRecording(title: "Untitled", context: viewContext)
                         showRecordingSheet = false
                     })
                 }
             }
             .padding()
             .onAppear {
-                intent.checkIfBookmarked(context: viewContext)
+                container.intent.checkIfBookmarked(context: viewContext)
             }
         }
     }

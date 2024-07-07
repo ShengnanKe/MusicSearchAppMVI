@@ -10,25 +10,25 @@ import Combine
 import CoreData
 import SwiftUI
 
-struct MusicBookmarkedState {
-    var bookmarkedMusic: [Music] = []
-    var errorMessage: String?
-}
-
+@MainActor
 class MusicBookmarkedIntent: ObservableObject {
-    @Published private(set) var state = MusicBookmarkedState()
+    @Published private(set) var model: MusicBookmarkedModel
     private var cancellables = Set<AnyCancellable>()
     private let dbManager = DBManager.shared
     private let fileManager = FAFileManager.shared
 
+    init(model: MusicBookmarkedModel) {
+        self.model = model
+    }
+
     func loadBookmarkedMusic(context: NSManagedObjectContext) {
         dbManager.setContext(context)
-        state.bookmarkedMusic = dbManager.fetchMusicData()
+        model.bookmarkedMusic = dbManager.fetchMusicData()
     }
 
     func deleteBookmarkedMusic(context: NSManagedObjectContext, at offsets: IndexSet) {
         for index in offsets {
-            let musicToDelete = state.bookmarkedMusic[index]
+            let musicToDelete = model.bookmarkedMusic[index]
             
             // 删除local files
             if let songTitle = musicToDelete.songTitle {
@@ -50,7 +50,7 @@ class MusicBookmarkedIntent: ObservableObject {
             try context.save()
             loadBookmarkedMusic(context: context)
         } catch {
-            state.errorMessage = "Failed to delete music: \(error)"
+            model.errorMessage = "Failed to delete music: \(error)"
         }
     }
 }

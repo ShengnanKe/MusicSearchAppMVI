@@ -34,6 +34,14 @@
 		4479B05F2C3757AA00912B00 /* MusicSearchIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4479B05E2C3757AA00912B00 /* MusicSearchIntent.swift */; };
 		4479B0612C3780D400912B00 /* MusicRecordingIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4479B0602C3780D400912B00 /* MusicRecordingIntent.swift */; };
 		4479B0632C37836000912B00 /* MusicBookmarkedIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4479B0622C37836000912B00 /* MusicBookmarkedIntent.swift */; };
+		4479B0672C3A030000912B00 /* MusicSearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4479B0662C3A030000912B00 /* MusicSearchModel.swift */; };
+		4479B06B2C3A0D7900912B00 /* MVIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4479B06A2C3A0D7900912B00 /* MVIContainer.swift */; };
+		4479B06D2C3A0F6000912B00 /* MusicSearchResultsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4479B06C2C3A0F6000912B00 /* MusicSearchResultsModel.swift */; };
+		4479B06F2C3A10A800912B00 /* MusicDetailsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4479B06E2C3A10A800912B00 /* MusicDetailsModel.swift */; };
+		4479B0712C3A11D600912B00 /* MusicBookmarkedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4479B0702C3A11D600912B00 /* MusicBookmarkedModel.swift */; };
+		4479B0732C3A124800912B00 /* MusicBookmarkedDetailsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4479B0722C3A124800912B00 /* MusicBookmarkedDetailsModel.swift */; };
+		4479B0752C3A12F800912B00 /* MusicRecordingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4479B0742C3A12F800912B00 /* MusicRecordingModel.swift */; };
+		4479B0772C3A143C00912B00 /* MusicRecordingDetailsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4479B0762C3A143C00912B00 /* MusicRecordingDetailsModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -65,6 +73,14 @@
 		4479B05E2C3757AA00912B00 /* MusicSearchIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSearchIntent.swift; sourceTree = "<group>"; };
 		4479B0602C3780D400912B00 /* MusicRecordingIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicRecordingIntent.swift; sourceTree = "<group>"; };
 		4479B0622C37836000912B00 /* MusicBookmarkedIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicBookmarkedIntent.swift; sourceTree = "<group>"; };
+		4479B0662C3A030000912B00 /* MusicSearchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSearchModel.swift; sourceTree = "<group>"; };
+		4479B06A2C3A0D7900912B00 /* MVIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MVIContainer.swift; sourceTree = "<group>"; };
+		4479B06C2C3A0F6000912B00 /* MusicSearchResultsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSearchResultsModel.swift; sourceTree = "<group>"; };
+		4479B06E2C3A10A800912B00 /* MusicDetailsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicDetailsModel.swift; sourceTree = "<group>"; };
+		4479B0702C3A11D600912B00 /* MusicBookmarkedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicBookmarkedModel.swift; sourceTree = "<group>"; };
+		4479B0722C3A124800912B00 /* MusicBookmarkedDetailsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicBookmarkedDetailsModel.swift; sourceTree = "<group>"; };
+		4479B0742C3A12F800912B00 /* MusicRecordingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicRecordingModel.swift; sourceTree = "<group>"; };
+		4479B0762C3A143C00912B00 /* MusicRecordingDetailsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicRecordingDetailsModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,11 +117,13 @@
 				4479B0002C359B1700912B00 /* ContentView.swift */,
 				4479B0022C359B1B00912B00 /* Assets.xcassets */,
 				4479B0072C359B1B00912B00 /* Persistence.swift */,
+				4479B0652C3A02F600912B00 /* Models */,
+				4479B0362C37525200912B00 /* Intents */,
+				4479B0642C3A023F00912B00 /* Containers */,
+				4479B0372C37526700912B00 /* Views */,
 				4479B0592C3755A100912B00 /* InfoModels */,
 				4479B0092C359B1B00912B00 /* MusicSearchAppMVI.xcdatamodeld */,
 				4479B0382C37526E00912B00 /* Managers */,
-				4479B0372C37526700912B00 /* Views */,
-				4479B0362C37525200912B00 /* Intents */,
 				4479B0042C359B1B00912B00 /* Preview Content */,
 			);
 			path = MusicSearchAppMVI;
@@ -140,8 +158,8 @@
 				4479B03F2C37532500912B00 /* HomeView.swift */,
 				4479B0412C37535900912B00 /* MusicSearchView.swift */,
 				4479B0432C37537700912B00 /* MusicSearchResultsView.swift */,
-				4479B0452C37539800912B00 /* RecordingTitleSheet.swift */,
 				4479B0472C3753BB00912B00 /* MusicDetailView.swift */,
+				4479B0452C37539800912B00 /* RecordingTitleSheet.swift */,
 				4479B0492C3753EF00912B00 /* MusicBookmarkedView.swift */,
 				4479B04B2C37540800912B00 /* MusicBookmarkedDetailsView.swift */,
 				4479B04D2C37542600912B00 /* MusicRecordingView.swift */,
@@ -167,6 +185,28 @@
 				4479B05C2C3755CC00912B00 /* MusicSearchRequest.swift */,
 			);
 			path = InfoModels;
+			sourceTree = "<group>";
+		};
+		4479B0642C3A023F00912B00 /* Containers */ = {
+			isa = PBXGroup;
+			children = (
+				4479B06A2C3A0D7900912B00 /* MVIContainer.swift */,
+			);
+			path = Containers;
+			sourceTree = "<group>";
+		};
+		4479B0652C3A02F600912B00 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0662C3A030000912B00 /* MusicSearchModel.swift */,
+				4479B06C2C3A0F6000912B00 /* MusicSearchResultsModel.swift */,
+				4479B06E2C3A10A800912B00 /* MusicDetailsModel.swift */,
+				4479B0702C3A11D600912B00 /* MusicBookmarkedModel.swift */,
+				4479B0722C3A124800912B00 /* MusicBookmarkedDetailsModel.swift */,
+				4479B0742C3A12F800912B00 /* MusicRecordingModel.swift */,
+				4479B0762C3A143C00912B00 /* MusicRecordingDetailsModel.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -242,11 +282,15 @@
 				4479B03A2C37529F00912B00 /* HttpClient.swift in Sources */,
 				4479B0082C359B1B00912B00 /* Persistence.swift in Sources */,
 				4479B0542C3754D900912B00 /* MusicDetailsIntent.swift in Sources */,
+				4479B0752C3A12F800912B00 /* MusicRecordingModel.swift in Sources */,
 				4479B04E2C37542600912B00 /* MusicRecordingView.swift in Sources */,
 				4479B0562C3754E700912B00 /* MusicBookmarkedDetailsIntent.swift in Sources */,
+				4479B0672C3A030000912B00 /* MusicSearchModel.swift in Sources */,
 				4479B03C2C3752CF00912B00 /* FAFileManager.swift in Sources */,
 				4479B0442C37537700912B00 /* MusicSearchResultsView.swift in Sources */,
+				4479B06F2C3A10A800912B00 /* MusicDetailsModel.swift in Sources */,
 				4479B0422C37535900912B00 /* MusicSearchView.swift in Sources */,
+				4479B0732C3A124800912B00 /* MusicBookmarkedDetailsModel.swift in Sources */,
 				4479B05B2C3755B300912B00 /* MusicRequestInfo.swift in Sources */,
 				4479B0012C359B1700912B00 /* ContentView.swift in Sources */,
 				4479B00B2C359B1B00912B00 /* MusicSearchAppMVI.xcdatamodeld in Sources */,
@@ -256,11 +300,15 @@
 				4479B0612C3780D400912B00 /* MusicRecordingIntent.swift in Sources */,
 				4479B0502C37544300912B00 /* MusicRecordingDetailsView.swift in Sources */,
 				4479B04C2C37540800912B00 /* MusicBookmarkedDetailsView.swift in Sources */,
+				4479B06D2C3A0F6000912B00 /* MusicSearchResultsModel.swift in Sources */,
 				4479B0522C3754C700912B00 /* MusicSearchResultsIntent.swift in Sources */,
 				4479B0402C37532500912B00 /* HomeView.swift in Sources */,
 				4479AFFF2C359B1700912B00 /* MusicSearchAppMVIApp.swift in Sources */,
+				4479B0772C3A143C00912B00 /* MusicRecordingDetailsModel.swift in Sources */,
 				4479B0462C37539800912B00 /* RecordingTitleSheet.swift in Sources */,
 				4479B05D2C3755CC00912B00 /* MusicSearchRequest.swift in Sources */,
+				4479B06B2C3A0D7900912B00 /* MVIContainer.swift in Sources */,
+				4479B0712C3A11D600912B00 /* MusicBookmarkedModel.swift in Sources */,
 				4479B03E2C3752EF00912B00 /* DBManager.swift in Sources */,
 				4479B05F2C3757AA00912B00 /* MusicSearchIntent.swift in Sources */,
 				4479B0482C3753BB00912B00 /* MusicDetailView.swift in Sources */,

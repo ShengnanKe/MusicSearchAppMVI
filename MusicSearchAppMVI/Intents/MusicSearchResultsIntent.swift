@@ -5,31 +5,32 @@
 //  Created by KKNANXX on 7/4/24.
 //
 
+import Foundation
 import Combine
 import SwiftUI
 
-//@MainActor
+@MainActor
 class MusicSearchResultsIntent: ObservableObject {
-    @Published private(set) var state: MusicSearchState
-
-    init(searchQuery: String) {
-        self.state = MusicSearchState(searchQuery: searchQuery)
+    @Published private(set) var model: MusicSearchResultsModel
+    
+    init(model: MusicSearchResultsModel) {
+        self.model = model
         fetchSearchResults()
     }
     
     func fetchSearchResults() {
-        state.isLoading = true
-        state.errorMessage = nil
+        model.isLoading = true
+        model.errorMessage = nil
         
         Task {
             do {
-                let request = MusicSearchRequest(query: state.searchQuery)
+                let request = MusicSearchRequest(query: model.searchQuery)
                 let results: MusicRequestInfo = try await HttpClient().fetchData(from: request)
-                self.state.searchResults = results.data
-                self.state.isLoading = false
+                self.model.searchResults = results.data
+                self.model.isLoading = false
             } catch {
-                self.state.errorMessage = error.localizedDescription
-                self.state.isLoading = false
+                self.model.errorMessage = error.localizedDescription
+                self.model.isLoading = false
             }
         }
     }
