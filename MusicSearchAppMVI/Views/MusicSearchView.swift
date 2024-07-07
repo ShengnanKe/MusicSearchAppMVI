@@ -12,7 +12,6 @@ struct MusicSearchView: View {
     @State private var isSearching = false
     
     init() {
-        let a  = 1
         let model = MusicSearchModel()
         let intent = MusicSearchIntent(model: model)
         _container = StateObject(wrappedValue: MVIContainer(intent: intent, model: model, modelChangePublisher: model.objectWillChange))
