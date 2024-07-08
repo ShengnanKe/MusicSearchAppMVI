@@ -117,10 +117,15 @@
 				4479B0002C359B1700912B00 /* ContentView.swift */,
 				4479B0022C359B1B00912B00 /* Assets.xcassets */,
 				4479B0072C359B1B00912B00 /* Persistence.swift */,
-				4479B0652C3A02F600912B00 /* Models */,
-				4479B0362C37525200912B00 /* Intents */,
+				4479B0782C3B5B2E00912B00 /* HomePage */,
+				4479B07C2C3B5B3D00912B00 /* SearchPage */,
+				4479B0802C3B5B5C00912B00 /* SearchResultPage */,
+				4479B0842C3B5C4000912B00 /* MusicDetailsPage */,
+				4479B0882C3B5C5E00912B00 /* MusicBookmarkedPage */,
+				4479B08C2C3B5C7C00912B00 /* MusicBookmarkedDetailsPage */,
+				4479B0902C3B5C9D00912B00 /* MusicRecordingPage */,
+				4479B0942C3B5CB600912B00 /* MusicRecordingDetailsPage */,
 				4479B0642C3A023F00912B00 /* Containers */,
-				4479B0372C37526700912B00 /* Views */,
 				4479B0592C3755A100912B00 /* InfoModels */,
 				4479B0092C359B1B00912B00 /* MusicSearchAppMVI.xcdatamodeld */,
 				4479B0382C37526E00912B00 /* Managers */,
@@ -135,37 +140,6 @@
 				4479B0052C359B1B00912B00 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		4479B0362C37525200912B00 /* Intents */ = {
-			isa = PBXGroup;
-			children = (
-				4479B05E2C3757AA00912B00 /* MusicSearchIntent.swift */,
-				4479B0512C3754C700912B00 /* MusicSearchResultsIntent.swift */,
-				4479B0532C3754D900912B00 /* MusicDetailsIntent.swift */,
-				4479B0622C37836000912B00 /* MusicBookmarkedIntent.swift */,
-				4479B0552C3754E700912B00 /* MusicBookmarkedDetailsIntent.swift */,
-				4479B0602C3780D400912B00 /* MusicRecordingIntent.swift */,
-				4479B0572C3754F200912B00 /* MusicRecordingDetailsIntent.swift */,
-			);
-			name = Intents;
-			path = MusicSearchAppMVI/Intents;
-			sourceTree = SOURCE_ROOT;
-		};
-		4479B0372C37526700912B00 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				4479B03F2C37532500912B00 /* HomeView.swift */,
-				4479B0412C37535900912B00 /* MusicSearchView.swift */,
-				4479B0432C37537700912B00 /* MusicSearchResultsView.swift */,
-				4479B0472C3753BB00912B00 /* MusicDetailView.swift */,
-				4479B0452C37539800912B00 /* RecordingTitleSheet.swift */,
-				4479B0492C3753EF00912B00 /* MusicBookmarkedView.swift */,
-				4479B04B2C37540800912B00 /* MusicBookmarkedDetailsView.swift */,
-				4479B04D2C37542600912B00 /* MusicRecordingView.swift */,
-				4479B04F2C37544300912B00 /* MusicRecordingDetailsView.swift */,
-			);
-			path = Views;
 			sourceTree = "<group>";
 		};
 		4479B0382C37526E00912B00 /* Managers */ = {
@@ -195,18 +169,251 @@
 			path = Containers;
 			sourceTree = "<group>";
 		};
-		4479B0652C3A02F600912B00 /* Models */ = {
+		4479B0782C3B5B2E00912B00 /* HomePage */ = {
+			isa = PBXGroup;
+			children = (
+				4479B03F2C37532500912B00 /* HomeView.swift */,
+			);
+			path = HomePage;
+			sourceTree = "<group>";
+		};
+		4479B0792C3B5B3D00912B00 /* Intent */ = {
+			isa = PBXGroup;
+			children = (
+				4479B05E2C3757AA00912B00 /* MusicSearchIntent.swift */,
+			);
+			path = Intent;
+			sourceTree = "<group>";
+		};
+		4479B07A2C3B5B3D00912B00 /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				4479B0662C3A030000912B00 /* MusicSearchModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		4479B07B2C3B5B3D00912B00 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0412C37535900912B00 /* MusicSearchView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		4479B07C2C3B5B3D00912B00 /* SearchPage */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0792C3B5B3D00912B00 /* Intent */,
+				4479B07A2C3B5B3D00912B00 /* Model */,
+				4479B07B2C3B5B3D00912B00 /* View */,
+			);
+			path = SearchPage;
+			sourceTree = "<group>";
+		};
+		4479B07D2C3B5B5C00912B00 /* Intent */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0512C3754C700912B00 /* MusicSearchResultsIntent.swift */,
+			);
+			path = Intent;
+			sourceTree = "<group>";
+		};
+		4479B07E2C3B5B5C00912B00 /* Model */ = {
+			isa = PBXGroup;
+			children = (
 				4479B06C2C3A0F6000912B00 /* MusicSearchResultsModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		4479B07F2C3B5B5C00912B00 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0432C37537700912B00 /* MusicSearchResultsView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		4479B0802C3B5B5C00912B00 /* SearchResultPage */ = {
+			isa = PBXGroup;
+			children = (
+				4479B07D2C3B5B5C00912B00 /* Intent */,
+				4479B07E2C3B5B5C00912B00 /* Model */,
+				4479B07F2C3B5B5C00912B00 /* View */,
+			);
+			path = SearchResultPage;
+			sourceTree = "<group>";
+		};
+		4479B0812C3B5C4000912B00 /* Intent */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0532C3754D900912B00 /* MusicDetailsIntent.swift */,
+			);
+			path = Intent;
+			sourceTree = "<group>";
+		};
+		4479B0822C3B5C4000912B00 /* Model */ = {
+			isa = PBXGroup;
+			children = (
 				4479B06E2C3A10A800912B00 /* MusicDetailsModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		4479B0832C3B5C4000912B00 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0472C3753BB00912B00 /* MusicDetailView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		4479B0842C3B5C4000912B00 /* MusicDetailsPage */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0812C3B5C4000912B00 /* Intent */,
+				4479B0822C3B5C4000912B00 /* Model */,
+				4479B0832C3B5C4000912B00 /* View */,
+			);
+			path = MusicDetailsPage;
+			sourceTree = "<group>";
+		};
+		4479B0852C3B5C5E00912B00 /* Intent */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0622C37836000912B00 /* MusicBookmarkedIntent.swift */,
+			);
+			path = Intent;
+			sourceTree = "<group>";
+		};
+		4479B0862C3B5C5E00912B00 /* Model */ = {
+			isa = PBXGroup;
+			children = (
 				4479B0702C3A11D600912B00 /* MusicBookmarkedModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		4479B0872C3B5C5E00912B00 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0492C3753EF00912B00 /* MusicBookmarkedView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		4479B0882C3B5C5E00912B00 /* MusicBookmarkedPage */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0852C3B5C5E00912B00 /* Intent */,
+				4479B0862C3B5C5E00912B00 /* Model */,
+				4479B0872C3B5C5E00912B00 /* View */,
+			);
+			path = MusicBookmarkedPage;
+			sourceTree = "<group>";
+		};
+		4479B0892C3B5C7C00912B00 /* Intent */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0552C3754E700912B00 /* MusicBookmarkedDetailsIntent.swift */,
+			);
+			path = Intent;
+			sourceTree = "<group>";
+		};
+		4479B08A2C3B5C7C00912B00 /* Model */ = {
+			isa = PBXGroup;
+			children = (
 				4479B0722C3A124800912B00 /* MusicBookmarkedDetailsModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		4479B08B2C3B5C7C00912B00 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4479B04B2C37540800912B00 /* MusicBookmarkedDetailsView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		4479B08C2C3B5C7C00912B00 /* MusicBookmarkedDetailsPage */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0892C3B5C7C00912B00 /* Intent */,
+				4479B08A2C3B5C7C00912B00 /* Model */,
+				4479B08B2C3B5C7C00912B00 /* View */,
+			);
+			path = MusicBookmarkedDetailsPage;
+			sourceTree = "<group>";
+		};
+		4479B08D2C3B5C9D00912B00 /* Intent */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0602C3780D400912B00 /* MusicRecordingIntent.swift */,
+			);
+			path = Intent;
+			sourceTree = "<group>";
+		};
+		4479B08E2C3B5C9D00912B00 /* Model */ = {
+			isa = PBXGroup;
+			children = (
 				4479B0742C3A12F800912B00 /* MusicRecordingModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		4479B08F2C3B5C9D00912B00 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4479B04D2C37542600912B00 /* MusicRecordingView.swift */,
+				4479B0452C37539800912B00 /* RecordingTitleSheet.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		4479B0902C3B5C9D00912B00 /* MusicRecordingPage */ = {
+			isa = PBXGroup;
+			children = (
+				4479B08D2C3B5C9D00912B00 /* Intent */,
+				4479B08E2C3B5C9D00912B00 /* Model */,
+				4479B08F2C3B5C9D00912B00 /* View */,
+			);
+			path = MusicRecordingPage;
+			sourceTree = "<group>";
+		};
+		4479B0912C3B5CB600912B00 /* Intent */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0572C3754F200912B00 /* MusicRecordingDetailsIntent.swift */,
+			);
+			path = Intent;
+			sourceTree = "<group>";
+		};
+		4479B0922C3B5CB600912B00 /* Model */ = {
+			isa = PBXGroup;
+			children = (
 				4479B0762C3A143C00912B00 /* MusicRecordingDetailsModel.swift */,
 			);
-			path = Models;
+			path = Model;
+			sourceTree = "<group>";
+		};
+		4479B0932C3B5CB600912B00 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4479B04F2C37544300912B00 /* MusicRecordingDetailsView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		4479B0942C3B5CB600912B00 /* MusicRecordingDetailsPage */ = {
+			isa = PBXGroup;
+			children = (
+				4479B0912C3B5CB600912B00 /* Intent */,
+				4479B0922C3B5CB600912B00 /* Model */,
+				4479B0932C3B5CB600912B00 /* View */,
+			);
+			path = MusicRecordingDetailsPage;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

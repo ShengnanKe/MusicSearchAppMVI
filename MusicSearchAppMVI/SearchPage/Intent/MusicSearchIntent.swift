@@ -11,7 +11,7 @@ import SwiftUI
 
 @MainActor
 class MusicSearchIntent: ObservableObject {
-    @Published private(set) var model: MusicSearchModel
+    @Published private var model: MusicSearchModel
     
     init(model: MusicSearchModel) {
         self.model = model

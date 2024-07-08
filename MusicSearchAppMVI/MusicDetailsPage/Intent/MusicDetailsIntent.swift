@@ -13,7 +13,7 @@ import CoreData
 
 @MainActor
 class MusicDetailsIntent: ObservableObject {
-    @Published private(set) var model: MusicDetailsModel
+    @Published private var model: MusicDetailsModel
     private var audioPlayer: AVAudioPlayer?
     private var audioRecorder: AVAudioRecorder?
     private var recordingURL: URL?

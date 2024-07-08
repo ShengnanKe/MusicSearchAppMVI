@@ -12,7 +12,7 @@ import SwiftUI
 
 @MainActor
 class MusicBookmarkedIntent: ObservableObject {
-    @Published private(set) var model: MusicBookmarkedModel
+    @Published private var model: MusicBookmarkedModel
     private var cancellables = Set<AnyCancellable>()
     private let dbManager = DBManager.shared
     private let fileManager = FAFileManager.shared

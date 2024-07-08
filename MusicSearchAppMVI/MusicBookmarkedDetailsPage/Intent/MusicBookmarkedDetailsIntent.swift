@@ -12,7 +12,7 @@ import AVFoundation
 
 @MainActor
 class MusicBookmarkedDetailsIntent: ObservableObject {
-    @Published private(set) var model: MusicBookmarkedDetailsModel
+    @Published private var model: MusicBookmarkedDetailsModel
     private var audioPlayer: AVAudioPlayer?
     private let fileManager = FAFileManager.shared
 

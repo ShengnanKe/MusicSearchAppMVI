@@ -17,7 +17,7 @@ struct MusicRecordingDetailsState {
 
 @MainActor
 class MusicRecordingDetailsIntent: ObservableObject {
-    @Published private(set) var model: MusicRecordingDetailsModel
+    @Published private var model: MusicRecordingDetailsModel
     private var audioPlayer: AVAudioPlayer?
     private let fileManager = FAFileManager.shared
 
